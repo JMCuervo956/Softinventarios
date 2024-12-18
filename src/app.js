@@ -184,7 +184,7 @@ console.log('DB_PASSWORD:', process.env.DB_PASSWORD);  // Debería mostrar la co
 
 app.get('/', async (req, res) => {		
     try {		
-        res.render('inventarios');		
+        res.render('login');		
     } catch (error) {		
         console.error('Error al renderizar la plantilla:', error);		
         res.status(500).json({ error: 'Error interno del servidor' });		
@@ -225,6 +225,11 @@ app.get('/login', (req, res)=>{
 //    }
 })
 
+app.get('/inventarios', (req, res)=>{
+            const userUser = req.session.unidad;
+            res.render('inventarios', { userUser });
+    })
+    
 // [video]
 app.get('/video', (req, res) => {
     res.render('video', { meetingLink: null });
