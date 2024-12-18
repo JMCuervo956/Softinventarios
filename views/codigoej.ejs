@@ -47,6 +47,11 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
+
+        .feedback {
+            font-size: 18px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -63,12 +68,15 @@
     <!-- Botón para iniciar el escaneo -->
     <button id="start-button">Iniciar Escaneo</button>
 
+    <div class="feedback" id="feedback"></div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const startButton = document.getElementById('start-button');
             const resultElement = document.getElementById('result');
             const statusElement = document.getElementById('status');
-            
+            const feedbackElement = document.getElementById('feedback');
+
             // Verificamos si el navegador soporta el acceso a la cámara
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 console.log('Cámara accesible');
@@ -109,19 +117,34 @@
                             console.error("Error de Quagga:", err);
                             statusElement.textContent = "Error al acceder a la cámara. Revisa los permisos.";
                             statusElement.style.color = "#f44336";
+                            feedbackElement.textContent = "Asegúrate de permitir acceso a la cámara.";
+                            feedbackElement.style.color = "#f44336";
                             return;
                         }
                         console.log("Cámara inicializada.");
                         Quagga.start();  // Iniciamos el escaneo
                         statusElement.textContent = "Escaneando...";
+                        feedbackElement.textContent = "";
                     });
 
                     // Función de escaneo exitoso
                     Quagga.onDetected(function(result) {
                         console.log("Código detectado:", result.codeResult.code);
-                        resultElement.textContent = result.codeResult.code;
-                        statusElement.textContent = "¡Escaneo exitoso!";
-                        statusElement.style.color = "#4caf50";
+                        resultElement.textContent = result.codeResult.code;  // Mostrar el código detectado
+                        statusElement.textContent = "¡Escaneo exitoso!";  // Mensaje de éxito
+                        statusElement.style.color = "#4caf50";  // Cambiar color a verde (para éxito)
+                        feedbackElement.textContent = "¡Código detectado exitosamente!";
+                        feedbackElement.style.color = "#4caf50";  // Color verde para el éxito
+                    });
+                    
+                    // Si no se detecta ningún código, mostrar mensaje de error
+                    Quagga.onProcessed(function(result) {
+                        if (result && result.codeResult && result.codeResult.code === null) {
+                            statusElement.textContent = "Escaneo fallido, intenta de nuevo.";
+                            statusElement.style.color = "#f44336";  // Rojo
+                            feedbackElement.textContent = "No se detectó ningún código. Intenta nuevamente.";
+                            feedbackElement.style.color = "#f44336";  // Rojo
+                        }
                     });
                 });
                 
