@@ -184,7 +184,7 @@ console.log('DB_PASSWORD:', process.env.DB_PASSWORD);  // Debería mostrar la co
 
 app.get('/', async (req, res) => {		
     try {		
-        res.render('codigoej');		
+        res.render('inventario');		
     } catch (error) {		
         console.error('Error al renderizar la plantilla:', error);		
         res.status(500).json({ error: 'Error interno del servidor' });		
@@ -247,6 +247,10 @@ app.get('/menuprc', (req, res) => {
     }
 });
 
+app.get('/inventario', (req, res) => {
+    res.render('inventario', { id, texto });
+});
+ 
 app.get('/register', (req, res) => {
     if (req.session.loggedin) {
         res.render('register');
