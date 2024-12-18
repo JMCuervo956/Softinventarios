@@ -3,159 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escanear Código de Barras</title>
+    <title>Leer Código de Barras</title>
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-
+        /* Puedes agregar tus estilos aquí */
         #scanner-container {
             width: 100%;
-            height: 100vh;
-            border: 1px solid #ccc;
-            background-color: #f0f0f0;
+            height: 300px;
+            margin-bottom: 10px;
             position: relative;
         }
-
-        #result {
-            font-size: 18px;
-            margin-top: 20px;
-            color: #333;
-        }
-
-        #status {
-            font-size: 18px;
-            color: #f44336;
-        }
-
-        h2 {
-            color: #333;
-        }
-
-        #start-button {
-            padding: 10px 20px;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin: 20px 0;
-        }
-
-        #start-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .feedback {
-            font-size: 18px;
-            margin-top: 20px;
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
     </style>
 </head>
 <body>
 
-    <h2>Escanear Código de Barras</h2>
-    
-    <!-- Contenedor para la cámara -->
-    <div id="scanner-container"></div>
-    
-    <!-- Resultados del escaneo -->
-    <p>El código escaneado es: <span id="result">Esperando...</span></p>
-    <p id="status">Esperando el escaneo...</p>
-    
-    <!-- Botón para iniciar el escaneo -->
-    <button id="start-button">Iniciar Escaneo</button>
+<h2>Escanear Código de Barras</h2>
 
-    <div class="feedback" id="feedback"></div>
+<!-- Contenedor de la cámara -->
+<div id="scanner-container">
+    <video id="barcode-scanner" autoplay></video>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const startButton = document.getElementById('start-button');
-            const resultElement = document.getElementById('result');
-            const statusElement = document.getElementById('status');
-            const feedbackElement = document.getElementById('feedback');
+<!-- Formulario de entrada para guardar los datos -->
+<form id="barcode-form">
+    <label for="barcode">Código de barras: </label>
+    <input type="text" id="barcode" name="barcode" readonly><br><br>
 
-            // Verificamos si el navegador soporta el acceso a la cámara
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                console.log('Cámara accesible');
-                startButton.disabled = false;  // Habilitamos el botón de inicio de escaneo
+    <label for="nombre">Nombre del Producto: </label>
+    <input type="text" id="nombre" name="nombre" required><br><br>
 
-                // Al hacer clic en el botón, iniciar el escaneo
-                startButton.addEventListener('click', function () {
-                    // Inicializamos QuaggaJS
-                    Quagga.init({
-                        inputStream: {
-                            name: "Live",
-                            type: "LiveStream",
-                            target: document.querySelector('#scanner-container'),  // El contenedor donde se muestra el video
-                            constraints: {
-                                facingMode: "environment"  // Cámara trasera del dispositivo
-                            },
-                            area: {
-                                top: "0%",    // Especificamos la región para el escaneo
-                                left: "0%",
-                                width: "100%",
-                                height: "100%"
-                            }
-                        },
-                        decoder: {
-                            readers: [
-                                "code_128_reader",
-                                "ean_reader",
-                                "ean_8_reader",
-                                "upc_reader",
-                                "code_39_reader",
-                                "code_93_reader",
-                                "codabar_reader",
-                                "itf_reader"
-                            ]
-                        }
-                    }, function(err) {
-                        if (err) {
-                            console.error("Error de Quagga:", err);
-                            statusElement.textContent = "Error al acceder a la cámara. Revisa los permisos.";
-                            statusElement.style.color = "#f44336";
-                            feedbackElement.textContent = "Asegúrate de permitir acceso a la cámara.";
-                            feedbackElement.style.color = "#f44336";
-                            return;
-                        }
-                        console.log("Cámara inicializada.");
-                        Quagga.start();  // Iniciamos el escaneo
-                        statusElement.textContent = "Escaneando...";
-                        feedbackElement.textContent = "";
-                    });
+    <label for="precio">Precio: </label>
+    <input type="text" id="precio" name="precio" required><br><br>
 
-                    // Función de escaneo exitoso
-                    Quagga.onDetected(function(result) {
-                        console.log("Código detectado:", result.codeResult.code);
-                        resultElement.textContent = result.codeResult.code;  // Mostrar el código detectado
-                        statusElement.textContent = "¡Escaneo exitoso!";  // Mensaje de éxito
-                        statusElement.style.color = "#4caf50";  // Cambiar color a verde (para éxito)
-                        feedbackElement.textContent = "¡Código detectado exitosamente!";
-                        feedbackElement.style.color = "#4caf50";  // Color verde para el éxito
-                    });
-                    
-                    // Si no se detecta ningún código, mostrar mensaje de error
-                    Quagga.onProcessed(function(result) {
-                        if (result && result.codeResult && result.codeResult.code === null) {
-                            statusElement.textContent = "Escaneo fallido, intenta de nuevo.";
-                            statusElement.style.color = "#f44336";  // Rojo
-                            feedbackElement.textContent = "No se detectó ningún código. Intenta nuevamente.";
-                            feedbackElement.style.color = "#f44336";  // Rojo
-                        }
-                    });
-                });
-                
-            } else {
-                console.error("El navegador no tiene soporte para la cámara.");
-                statusElement.textContent = "El navegador no tiene soporte para la cámara.";
-                statusElement.style.color = "#f44336";
-                startButton.disabled = true;  // Deshabilitamos el botón si no hay soporte para la cámara
+    <button type="submit">Guardar Producto</button>
+</form>
+
+<script>
+    // Inicializar QuaggaJS para leer el código de barras
+    function startScanner() {
+        Quagga.init({
+            inputStream: {
+                type: "LiveStream",
+                target: document.querySelector('#barcode-scanner'), // Contenedor del video
+                constraints: {
+                    facingMode: "environment" // Cámara trasera en dispositivos móviles
+                }
+            },
+            decoder: {
+                readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"] // Los tipos de códigos de barras que vamos a leer
             }
+        }, function(err) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            Quagga.start(); // Iniciar la lectura
         });
-    </script>
+
+        // Procesar el resultado de la lectura del código de barras
+        Quagga.onDetected(function(result) {
+            const codigoDeBarras = result.codeResult.code;
+            document.getElementById('barcode').value = codigoDeBarras; // Guardar el código en el campo de texto
+
+            // Si quieres detener el escaneo después de encontrar un código, puedes hacer:
+            // Quagga.stop();
+        });
+    }
+
+    // Iniciar el escáner al cargar la página
+    window.onload = function() {
+        startScanner();
+    };
+
+    // Procesar el formulario
+    document.getElementById('barcode-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const barcode = document.getElementById('barcode').value;
+        const nombre = document.getElementById('nombre').value;
+        const precio = document.getElementById('precio').value;
+
+        // Aquí puedes hacer algo con los datos como enviarlos a un servidor o almacenarlos localmente
+        console.log('Código de barras:', barcode);
+        console.log('Nombre del Producto:', nombre);
+        console.log('Precio:', precio);
+
+        // Limpiar el formulario después de enviar los datos
+        document.getElementById('barcode').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('precio').value = '';
+    });
+</script>
 
 </body>
 </html>
+
