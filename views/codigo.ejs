@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner de Códigos de Barras</title>
+    <script src="https://unpkg.com/@zxing/library@latest"></script> <!-- Incluye la librería ZXing -->
+</head>
+<body>
+
+    <h1>Escáner de Códigos de Barras</h1>
+    <video id="video" width="300" height="200" autoplay></video> <!-- Video de captura -->
+    <canvas id="canvas" width="300" height="200" style="display:none;"></canvas> <!-- Canvas oculto -->
+    <div id="result"></div> <!-- Mostrará el resultado del escaneo -->
+    
+    <button id="startScanButton">Iniciar escaneo</button> <!-- Botón para iniciar el escaneo -->
+
+    <script>
+        window.onload = function() {
+            const videoElement = document.getElementById('video');
+            const canvasElement = document.getElementById('canvas');
+            const canvas = canvasElement.getContext('2d');
+            const resultDiv = document.getElementById('result');
+            const startScanButton = document.getElementById('startScanButton');
+
+            const codeReader = new ZXing.BrowserMultiFormatReader();
+
+            // Inicia el escaneo
+            async function startScanning() {
+                try {
+                    // Acceder a la cámara del dispositivo
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    videoElement.srcObject = stream;
+                    videoElement.setAttribute('playsinline', true); // Necesario para dispositivos móviles
+                    videoElement.play();
+                    // Esperamos que el video esté cargado y tenga suficientes datos antes de iniciar el escaneo
+                    videoElement.onloadeddata = () => {
+                        requestAnimationFrame(scan); // Comienza el proceso de escaneo
+                    };
+                } catch (err) {
+                    console.error('No se pudo acceder a la cámara:', err);
+                }
+            }
+
+            // Función de escaneo de cada fotograma
+            function scan() {
+                if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+                    // Aseguramos que las dimensiones del canvas sean las mismas que las del video
+                    canvasElement.width = videoElement.videoWidth;
+                    canvasElement.height = videoElement.videoHeight;
+
+                    // Captura el fotograma del video y lo dibuja en el canvas
+                    canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+                    try {
+                        // Obtiene los datos del fotograma del canvas
+                        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                        const result = codeReader.decodeFromImage(imageData);
+
+                        if (result) {
+                            // Muestra el código de barras detectado
+                            resultDiv.textContent = `Código de barras detectado: ${result.getText()}`;
+                        }
+                    } catch (e) {
+                        if (!(e instanceof ZXing.NotFoundException)) {
+                            // Maneja el error si no se encuentra el código
+                            console.error('Error al escanear el código de barras:', e);
+                        }
+                    }
+                }
+
+                // Continúa el escaneo en el siguiente fotograma
+                requestAnimationFrame(scan);
+            }
+
+            // Inicia el escaneo solo cuando el usuario hace clic
+            startScanButton.addEventListener('click', startScanning);
+        };
+    </script>
+
+</body>
+</html>
