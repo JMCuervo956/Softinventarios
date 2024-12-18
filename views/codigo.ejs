@@ -3,47 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escaneo de código de barras</title>
-    <script type="module">
-        document.addEventListener('DOMContentLoaded', () => {
-            // Referencia a los campos del formulario
-            const barcodeField = document.getElementById('barcode');
-            const nameField = document.getElementById('name');
-            const priceField = document.getElementById('price');
-
-            // Evento para capturar el código de barras
-            barcodeField.addEventListener('input', () => {
-                // Asegúrate de que el código de barras esté completo antes de mover el enfoque
-                if (barcodeField.value.length > 0) {
-                    console.log('Código de barras escaneado:', barcodeField.value);
-
-                    // Mover el foco al siguiente campo (campo "name")
-                    nameField.focus();
-                }
-            });
-
-            // Opcionalmente, puedes añadir eventos para los demás campos
-            nameField.addEventListener('input', () => {
-                if (nameField.value.length > 0) {
-                    console.log('Nombre ingresado:', nameField.value);
-                    priceField.focus();  // Mover foco al campo de precio
-                }
-            });
-        });
-    </script>
+    <title>Escáner de Código de Barras</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        #scanner-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: none; /* Ocultamos el escáner hasta que se active */
+        }
+        #form-container {
+            display: block;
+        }
+    </style>
 </head>
 <body>
 
-<form>
-    <label for="barcode">Código de barras:</label>
-    <input type="text" id="barcode" placeholder="Escanea el código de barras" autofocus><br><br>
+<h2>Formulario con Escaneo de Código de Barras</h2>
 
-    <label for="name">Nombre del producto:</label>
-    <input type="text" id="name" placeholder="Ingrese el nombre del producto"><br><br>
+<!-- Contenedor del escáner -->
+<div id="scanner-container">
+    <div id="qr-reader" style="width: 100%; height: 300px;"></div>
+</div>
 
-    <label for="price">Precio:</label>
-    <input type="text" id="price" placeholder="Ingrese el precio del producto"><br><br>
-</form>
+<!-- Formulario de entrada -->
+<div id="form-container">
+    <form>
+        <label for="barcode">Código de barras:</label>
+        <input type="text" id="barcode" placeholder="Escanea el código de barras" readonly><br><br>
+
+        <label for="name">Nombre del producto:</label>
+        <input type="text" id="name" placeholder="Ingrese el nombre del producto"><br><br>
+
+        <label for="price">Precio:</label>
+        <input type="text" id="price" placeholder="Ingrese el precio del producto"><br><br>
+    </form>
+    <button onclick="startScanning()">Escanear código de barras</button>
+</div>
+
+<script>
+    let qrCodeScanner;
+
+    // Función para iniciar el escaneo
+    function startScanning() {
+        // Ocultamos el formulario y mostramos el escáner
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('scanner-container').style.display = 'block';
+
+        // Iniciamos el escáner de código de barras con la cámara
+        qrCodeScanner = new Html5Qrcode("qr-reader");
+
+        qrCodeScanner.start(
+            { facingMode: "environment" }, // Usamos la cámara trasera del dispositivo
+            {
+                fps: 10, // Frames por segundo
+                qrbox: 250 // Tamaño del área donde se busca el código de barras
+            },
+            (decodedText, decodedResult) => {
+                // El código de barras ha sido escaneado
+                console.log("Código de barras detectado:", decodedText);
+
+                // Colocamos el valor del código en el campo correspondiente
+                document.getElementById('barcode').value = decodedText;
+
+                // Detenemos el escáner
+                qrCodeScanner.stop().then(() => {
+                    // Mostramos nuevamente el formulario y ocultamos el escáner
+                    document.getElementById('scanner-container').style.display = 'none';
+                    document.getElementById('form-container').style.display = 'block';
+                }).catch((error) => {
+                    console.error("Error al detener el escáner:", error);
+                });
+            },
+            (errorMessage) => {
+                // Ocurre si hay un error durante el escaneo (ej., código no detectado)
+                console.error(errorMessage);
+            }
+        ).catch((error) => {
+            console.error("Error al iniciar el escáner:", error);
+        });
+    }
+</script>
 
 </body>
 </html>
