@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escanear Código de Barras</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+<h2>Escanea el código de barras</h2>
+
+<!-- Contenedor del escáner -->
+<div id="scanner-container" style="width: 100%; height: 400px;"></div>
+
+<!-- Campo para mostrar el código escaneado -->
+<p>El código escaneado es: <span id="result"></span></p>
+
+<script>
+    function onScanSuccess(decodedText, decodedResult) {
+        // Cuando el código es escaneado, se muestra el resultado en el campo
+        console.log(`Código detectado: ${decodedText}`);
+        document.getElementById('result').textContent = decodedText;
+    }
+
+    function onScanError(errorMessage) {
+        console.error(errorMessage);
+    }
+
+    // Configuración para iniciar el escáner
+    let scanner = new Html5Qrcode("scanner-container");
+
+    // Empezar a escanear usando la cámara trasera del iPhone
+    scanner.start(
+        { facingMode: "environment" }, // Usar la cámara trasera
+        {
+            fps: 10, // Frames por segundo
+            qrbox: 250, // Tamaño del área de escaneo
+        },
+        onScanSuccess,
+        onScanError
+    ).catch((error) => {
+        console.error(`Error al iniciar el escáner: ${error}`);
+    });
+</script>
+
+</body>
+</html>

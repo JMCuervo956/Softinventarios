@@ -184,7 +184,7 @@ console.log('DB_PASSWORD:', process.env.DB_PASSWORD);  // Debería mostrar la co
 
 app.get('/', async (req, res) => {		
     try {		
-        res.render('codigo');		
+        res.render('codigoej');		
     } catch (error) {		
         console.error('Error al renderizar la plantilla:', error);		
         res.status(500).json({ error: 'Error interno del servidor' });		
@@ -491,6 +491,16 @@ app.get('/codigo', (req, res) => {
     if (req.session.loggedin) {
         const { user, name } = req.session;
         res.render('codigo', { user, name });
+    } else {
+        res.send('Por favor, inicia sesión primero.');
+    }
+});
+
+
+app.get('/codigoej', (req, res) => {
+    if (req.session.loggedin) {
+        const { user, name } = req.session;
+        res.render('codigoej', { user, name });
     } else {
         res.send('Por favor, inicia sesión primero.');
     }
