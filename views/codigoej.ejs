@@ -5,42 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escanear Código de Barras</title>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        #scanner-container {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Escanea el código de barras</h2>
+<h2>Escanear Código de Barras</h2>
 
-<!-- Contenedor del escáner -->
-<div id="scanner-container" style="width: 100%; height: 400px;"></div>
+<!-- Contenedor para la cámara -->
+<div id="scanner-container"></div>
 
-<!-- Campo para mostrar el código escaneado -->
+<!-- Mostrar el resultado del código escaneado -->
 <p>El código escaneado es: <span id="result"></span></p>
 
 <script>
     function onScanSuccess(decodedText, decodedResult) {
-        // Cuando el código es escaneado, se muestra el resultado en el campo
-        console.log(`Código detectado: ${decodedText}`);
+        // Cuando el código es escaneado, muestra el texto en la página
+        console.log("Código detectado:", decodedText);
         document.getElementById('result').textContent = decodedText;
     }
 
     function onScanError(errorMessage) {
-        console.error(errorMessage);
+        console.warn("Error de escaneo:", errorMessage);
     }
 
-    // Configuración para iniciar el escáner
-    let scanner = new Html5Qrcode("scanner-container");
+    // Crear una instancia del escáner
+    const scanner = new Html5Qrcode("scanner-container");
 
-    // Empezar a escanear usando la cámara trasera del iPhone
+    // Iniciar el escáner con la cámara trasera
     scanner.start(
         { facingMode: "environment" }, // Usar la cámara trasera
         {
             fps: 10, // Frames por segundo
             qrbox: 250, // Tamaño del área de escaneo
         },
-        onScanSuccess,
-        onScanError
+        onScanSuccess, // Callback cuando se detecta un código
+        onScanError // Callback para manejar errores
     ).catch((error) => {
-        console.error(`Error al iniciar el escáner: ${error}`);
+        console.error("Error al iniciar el escáner:", error);
     });
 </script>
 
