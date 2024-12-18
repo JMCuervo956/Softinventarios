@@ -84,10 +84,25 @@
                             target: document.querySelector('#scanner-container'),  // El contenedor donde se muestra el video
                             constraints: {
                                 facingMode: "environment"  // Cámara trasera del dispositivo
+                            },
+                            area: {
+                                top: "0%",    // Especificamos la región para el escaneo
+                                left: "0%",
+                                width: "100%",
+                                height: "100%"
                             }
                         },
                         decoder: {
-                            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader", "code_39_reader", "code_93_reader", "codabar_reader", "itf_reader"]
+                            readers: [
+                                "code_128_reader",
+                                "ean_reader",
+                                "ean_8_reader",
+                                "upc_reader",
+                                "code_39_reader",
+                                "code_93_reader",
+                                "codabar_reader",
+                                "itf_reader"
+                            ]
                         }
                     }, function(err) {
                         if (err) {
