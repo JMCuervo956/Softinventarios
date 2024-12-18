@@ -3,55 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escanear Código de Barras con QuaggaJS</title>
-    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+    <title>Escanear Código de Barras</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
         #scanner-container {
             width: 100%;
-            height: 400px;
+            height: 100vh;  /* Altura completa de la pantalla */
+            border: 1px solid #ccc;
             background-color: #f0f0f0;
+            position: relative;
+        }
+
+        #result {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        #status {
+            font-size: 18px;
+            color: #f44336;  /* Inicialmente color rojo para errores */
+        }
+
+        #success {
+            font-size: 18px;
+            color: #4caf50;  /* Color verde para el éxito */
+        }
+
+        h2 {
+            color: #333;
         }
     </style>
 </head>
 <body>
 
-<h2>Escanear Código de Barras</h2>
+    <h2>Escanear Código de Barras o QR</h2>
 
-<!-- Contenedor para la cámara -->
-<div id="scanner-container"></div>
+    <!-- Contenedor para el escáner -->
+    <div id="scanner-container"></div>
 
-<!-- Resultado -->
-<p>El código escaneado es: <span id="result">Esperando...</span></p>
+    <!-- Mostrar el código escaneado -->
+    <p>El código escaneado es: <span id="result">Esperando...</span></p>
 
-<script>
-    // Inicialización de QuaggaJS
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#scanner-container'), // Contenedor donde se mostrará el video
-            constraints: {
-                facingMode: "environment", // Usar la cámara trasera
+    <!-- Mensajes de estado para indicar éxito o error -->
+    <p id="status">Esperando el escaneo...</p>
+
+    <script>
+        // Esperamos que el DOM esté completamente cargado antes de ejecutar el script
+        document.addEventListener('DOMContentLoaded', function () {
+            // Verificamos si estamos en un entorno de navegador
+            if (typeof window !== 'undefined') {
+                // Verificamos que el navegador tenga acceso a la cámara
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    console.log('Cámara accesible');
+                    
+                    // Calculamos el tamaño del recuadro de escaneo en función del tamaño de la pantalla
+                    let qrBoxSize = Math.min(window.innerWidth, window.innerHeight) * 0.6;  // 60% del tamaño de la pantalla
+
+                    // Función que maneja el éxito del escaneo
+                    function onScanSuccess(decodedText, decodedResult) {
+                        console.log("Código detectado: ", decodedText);
+                        document.getElementById('result').textContent = decodedText;
+
+                        // Mostrar un mensaje de éxito en la página
+                        document.getElementById('status').textContent = "¡Escaneo exitoso!";
+                        document.getElementById('status').style.color = "#4caf50";  // Verde
+                    }
+
+                    // Función que maneja los errores de escaneo
+                    function onScanError(errorMessage) {
+                        console.warn("Error de escaneo:", errorMessage);
+                        
+                        // Mostrar un mensaje de error en la página
+                        document.getElementById('status').textContent = "Error al escanear el código. Intenta de nuevo.";
+                        document.getElementById('status').style.color = "#f44336";  // Rojo
+                    }
+
+                    // Inicialización del escáner con el contenedor y los parámetros definidos
+                    const scanner = new Html5Qrcode("scanner-container");
+
+                    // Intentamos iniciar el escáner con la cámara trasera del dispositivo
+                    scanner.start(
+                        { facingMode: "environment" },  // Usamos la cámara trasera del dispositivo
+                        {
+                            fps: 10,            // Frames por segundo para el escaneo
+                            qrbox: {
+                                width: qrBoxSize,  // 60% del tamaño de la pantalla (ancho)
+                                height: qrBoxSize  // 60% del tamaño de la pantalla (alto)
+                            },
+                        },
+                        onScanSuccess,  // Callback para cuando el escaneo sea exitoso
+                        onScanError     // Callback para cuando haya un error
+                    ).catch((error) => {
+                        console.error("Error al iniciar el escáner:", error);
+                        document.getElementById('result').textContent = "No se pudo acceder a la cámara. Verifica los permisos.";
+                        document.getElementById('status').textContent = "Error: No se pudo acceder a la cámara.";
+                        document.getElementById('status').style.color = "#f44336";  // Rojo
+                    });
+                } else {
+                    // Si no hay acceso a la cámara, mostramos un mensaje de error
+                    console.error("No se puede acceder a la cámara.");
+                    document.getElementById('status').textContent = "No se puede acceder a la cámara. Verifica los permisos.";
+                    document.getElementById('status').style.color = "#f44336";  // Rojo
+                }
+            } else {
+                console.warn("Este código no se puede ejecutar en el entorno actual porque `window` no está definido.");
             }
-        },
-        decoder: {
-            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader"] // Tipos de códigos de barras a leer
-        }
-    }, function(err) {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        // Iniciar la cámara
-        Quagga.start();
-    });
-
-    // Evento cuando se detecta un código
-    Quagga.onDetected(function(result) {
-        console.log("Código detectado:", result.codeResult.code);
-        document.getElementById('result').textContent = result.codeResult.code;
-    });
-</script>
+        });
+    </script>
 
 </body>
 </html>

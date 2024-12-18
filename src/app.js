@@ -1647,6 +1647,7 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
 
+/*
 async function runPuppeteer() {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -1736,4 +1737,7 @@ async function runPuppeteer() {
 }
 
 /// CERRAR CONEXIONES :  connection.release(); //
+
+*/
+
 
