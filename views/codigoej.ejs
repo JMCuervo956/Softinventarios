@@ -10,48 +10,66 @@
 
 <h2>Escanear Código de Barras</h2>
 
-<video id="barcode-scanner" autoplay></video>
+<!-- Video para mostrar la cámara -->
+<video id="barcode-scanner" width="100%" height="auto" autoplay></video>
+
+<!-- Campo para mostrar el código de barras -->
+<input type="text" id="barcode" readonly>
 
 <script>
-    // Asegúrate de que Quagga se inicializa correctamente con la cámara trasera
+    // Función para inicializar la cámara y Quagga
     function startScanner() {
-        // Verifica si la cámara está disponible
+        // Verifica si el navegador soporta getUserMedia
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "environment" }
+                video: {
+                    facingMode: "environment" // Asegura que se use la cámara trasera
+                }
             })
-            .then(function (stream) {
+            .then(function(stream) {
+                // Conectar el flujo de la cámara al elemento video
                 const video = document.getElementById('barcode-scanner');
                 video.srcObject = stream;
 
-                // Inicializa Quagga
+                // Iniciar Quagga con el video como fuente
                 Quagga.init({
                     inputStream: {
                         type: "LiveStream",
-                        target: video, // Aquí usamos el video de la cámara
+                        target: video, // Este es el video en el que se mostrará la cámara
+                        constraints: {
+                            facingMode: "environment" // Especificamos la cámara trasera
+                        }
                     },
                     decoder: {
-                        readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"]
+                        readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"] // Tipos de código de barras
                     }
                 }, function(err) {
                     if (err) {
                         console.error(err);
                         return;
                     }
-                    Quagga.start(); // Comienza el escaneo
+                    // Comienza el escaneo
+                    Quagga.start();
                 });
             })
-            .catch(function (err) {
-                console.log("Error al acceder a la cámara: " + err);
+            .catch(function(err) {
+                console.error("Error al acceder a la cámara: ", err);
+                alert("No se pudo acceder a la cámara. Asegúrate de que esté habilitada en el navegador.");
             });
         } else {
-            alert("El navegador no soporta la cámara");
+            alert("El navegador no soporta el acceso a la cámara.");
         }
     }
 
-    window.onload = function() {
-        startScanner();
-    };
+    // Ejecuta la función al cargar la página
+    window.onload = startScanner;
+
+    // Función para procesar el resultado del código de barras
+    Quagga.onDetected(function(result) {
+        const barcode = result.codeResult.code;
+        document.getElementById('barcode').value = barcode;
+        console.log("Código de barras detectado:", barcode);
+    });
 </script>
 
 </body>
