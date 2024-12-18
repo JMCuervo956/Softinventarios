@@ -3,80 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escáner de Códigos de Barras</title>
-    <script src="https://unpkg.com/@zxing/library@latest"></script> <!-- Incluye la librería ZXing -->
+    <title>Escaneo de código de barras</title>
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referencia a los campos del formulario
+            const barcodeField = document.getElementById('barcode');
+            const nameField = document.getElementById('name');
+            const priceField = document.getElementById('price');
+
+            // Evento para capturar el código de barras
+            barcodeField.addEventListener('input', () => {
+                // Asegúrate de que el código de barras esté completo antes de mover el enfoque
+                if (barcodeField.value.length > 0) {
+                    console.log('Código de barras escaneado:', barcodeField.value);
+
+                    // Mover el foco al siguiente campo (campo "name")
+                    nameField.focus();
+                }
+            });
+
+            // Opcionalmente, puedes añadir eventos para los demás campos
+            nameField.addEventListener('input', () => {
+                if (nameField.value.length > 0) {
+                    console.log('Nombre ingresado:', nameField.value);
+                    priceField.focus();  // Mover foco al campo de precio
+                }
+            });
+        });
+    </script>
 </head>
 <body>
 
-    <h1>Escáner de Códigos de Barras</h1>
-    <video id="video" width="300" height="200" autoplay></video> <!-- Video de captura -->
-    <canvas id="canvas" width="300" height="200" style="display:none;"></canvas> <!-- Canvas oculto -->
-    <div id="result"></div> <!-- Mostrará el resultado del escaneo -->
-    
-    <button id="startScanButton">Iniciar escaneo</button> <!-- Botón para iniciar el escaneo -->
+<form>
+    <label for="barcode">Código de barras:</label>
+    <input type="text" id="barcode" placeholder="Escanea el código de barras" autofocus><br><br>
 
-    <script>
-        window.onload = function() {
-            const videoElement = document.getElementById('video');
-            const canvasElement = document.getElementById('canvas');
-            const canvas = canvasElement.getContext('2d');
-            const resultDiv = document.getElementById('result');
-            const startScanButton = document.getElementById('startScanButton');
+    <label for="name">Nombre del producto:</label>
+    <input type="text" id="name" placeholder="Ingrese el nombre del producto"><br><br>
 
-            const codeReader = new ZXing.BrowserMultiFormatReader();
-
-            // Inicia el escaneo
-            async function startScanning() {
-                try {
-                    // Acceder a la cámara del dispositivo
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                    videoElement.srcObject = stream;
-                    videoElement.setAttribute('playsinline', true); // Necesario para dispositivos móviles
-                    videoElement.play();
-                    // Esperamos que el video esté cargado y tenga suficientes datos antes de iniciar el escaneo
-                    videoElement.onloadeddata = () => {
-                        requestAnimationFrame(scan); // Comienza el proceso de escaneo
-                    };
-                } catch (err) {
-                    console.error('No se pudo acceder a la cámara:', err);
-                }
-            }
-
-            // Función de escaneo de cada fotograma
-            function scan() {
-                if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
-                    // Aseguramos que las dimensiones del canvas sean las mismas que las del video
-                    canvasElement.width = videoElement.videoWidth;
-                    canvasElement.height = videoElement.videoHeight;
-
-                    // Captura el fotograma del video y lo dibuja en el canvas
-                    canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
-                    try {
-                        // Obtiene los datos del fotograma del canvas
-                        const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-                        const result = codeReader.decodeFromImage(imageData);
-
-                        if (result) {
-                            // Muestra el código de barras detectado
-                            resultDiv.textContent = `Código de barras detectado: ${result.getText()}`;
-                        }
-                    } catch (e) {
-                        if (!(e instanceof ZXing.NotFoundException)) {
-                            // Maneja el error si no se encuentra el código
-                            console.error('Error al escanear el código de barras:', e);
-                        }
-                    }
-                }
-
-                // Continúa el escaneo en el siguiente fotograma
-                requestAnimationFrame(scan);
-            }
-
-            // Inicia el escaneo solo cuando el usuario hace clic
-            startScanButton.addEventListener('click', startScanning);
-        };
-    </script>
+    <label for="price">Precio:</label>
+    <input type="text" id="price" placeholder="Ingrese el precio del producto"><br><br>
+</form>
 
 </body>
 </html>
