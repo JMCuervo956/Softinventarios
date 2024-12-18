@@ -3,103 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leer Código de Barras</title>
+    <title>Escanear Código de Barras</title>
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
-    <style>
-        /* Puedes agregar tus estilos aquí */
-        #scanner-container {
-            width: 100%;
-            height: 300px;
-            margin-bottom: 10px;
-            position: relative;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-    </style>
 </head>
 <body>
 
 <h2>Escanear Código de Barras</h2>
 
-<!-- Contenedor de la cámara -->
-<div id="scanner-container">
-    <video id="barcode-scanner" autoplay></video>
-</div>
-
-<!-- Formulario de entrada para guardar los datos -->
-<form id="barcode-form">
-    <label for="barcode">Código de barras: </label>
-    <input type="text" id="barcode" name="barcode" readonly><br><br>
-
-    <label for="nombre">Nombre del Producto: </label>
-    <input type="text" id="nombre" name="nombre" required><br><br>
-
-    <label for="precio">Precio: </label>
-    <input type="text" id="precio" name="precio" required><br><br>
-
-    <button type="submit">Guardar Producto</button>
-</form>
+<video id="barcode-scanner" autoplay></video>
 
 <script>
-    // Inicializar QuaggaJS para leer el código de barras
+    // Asegúrate de que Quagga se inicializa correctamente con la cámara trasera
     function startScanner() {
-        Quagga.init({
-            inputStream: {
-                type: "LiveStream",
-                target: document.querySelector('#barcode-scanner'), // Contenedor del video
-                constraints: {
-                    facingMode: "environment" // Cámara trasera en dispositivos móviles
-                }
-            },
-            decoder: {
-                readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"] // Los tipos de códigos de barras que vamos a leer
-            }
-        }, function(err) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            Quagga.start(); // Iniciar la lectura
-        });
+        // Verifica si la cámara está disponible
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "environment" }
+            })
+            .then(function (stream) {
+                const video = document.getElementById('barcode-scanner');
+                video.srcObject = stream;
 
-        // Procesar el resultado de la lectura del código de barras
-        Quagga.onDetected(function(result) {
-            const codigoDeBarras = result.codeResult.code;
-            document.getElementById('barcode').value = codigoDeBarras; // Guardar el código en el campo de texto
-
-            // Si quieres detener el escaneo después de encontrar un código, puedes hacer:
-            // Quagga.stop();
-        });
+                // Inicializa Quagga
+                Quagga.init({
+                    inputStream: {
+                        type: "LiveStream",
+                        target: video, // Aquí usamos el video de la cámara
+                    },
+                    decoder: {
+                        readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"]
+                    }
+                }, function(err) {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    Quagga.start(); // Comienza el escaneo
+                });
+            })
+            .catch(function (err) {
+                console.log("Error al acceder a la cámara: " + err);
+            });
+        } else {
+            alert("El navegador no soporta la cámara");
+        }
     }
 
-    // Iniciar el escáner al cargar la página
     window.onload = function() {
         startScanner();
     };
-
-    // Procesar el formulario
-    document.getElementById('barcode-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const barcode = document.getElementById('barcode').value;
-        const nombre = document.getElementById('nombre').value;
-        const precio = document.getElementById('precio').value;
-
-        // Aquí puedes hacer algo con los datos como enviarlos a un servidor o almacenarlos localmente
-        console.log('Código de barras:', barcode);
-        console.log('Nombre del Producto:', nombre);
-        console.log('Precio:', precio);
-
-        // Limpiar el formulario después de enviar los datos
-        document.getElementById('barcode').value = '';
-        document.getElementById('nombre').value = '';
-        document.getElementById('precio').value = '';
-    });
 </script>
 
 </body>
 </html>
-
