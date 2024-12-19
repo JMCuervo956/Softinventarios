@@ -8,15 +8,26 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <%- include('partials/head') %>
+
+    <!-- Agregar el estilo para el campo deshabilitado -->
+    <style>
+        .input-disabled {
+            background-color: blue;  /* Fondo azul */
+            color: white;  /* Texto blanco */
+            cursor: not-allowed;  /* Cambiar el cursor para indicar que no es editable */
+        }
+    </style>
 </head>
 <body>
     <script src="app.js"></script>
     <%- include('partials/navigation') %>  
     <div class="content">
-        <h4>Registro de Usuarios</h4>
+        <h4>Registro de Inventario</h4>
         <div class="register-form30"> 
             <form id="registerForm" action="/register" method="POST"> 
                 <div class="contenedor__login-register">
+                    <h1></h1>
+                    <input type="text" name="CodActivo" class="input-small" placeholder="Activo" required autocomplete="off">
                     <h1></h1>
                     <input type="text" name="UsuarioNew" class="input-small" placeholder="Descripcion Generica" required autocomplete="off">
                     <h1></h1>
@@ -48,9 +59,8 @@
 
                     <div style="display: inline;">
                         <h5></h5>
-                        <a href="/activos" class="btn-cancel" tabindex="-1">Regresar</a>
                         <input type="submit" class="btn-save" value="Registrar" tabindex="-1">
-                        <a href="/grpcc" class="btn-cancel" tabindex="-1">Cancelar</a>
+                        <a href="#" id="cancelBtn" class="btn-cancel" tabindex="-1">Cancelar</a> <!-- Modificado: Cambiar href -->
                     </div>
                 </div>       
             </form>
@@ -60,8 +70,8 @@
     <script>
         // Establece el enfoque inicial en el primer campo de entrada
         window.onload = function() {
-            document.querySelector('input[name="UsuarioNew"]').focus();
-        }
+            document.querySelector('input[name="CodActivo"]').focus();
+        };
 
         // Manejo de la tecla TAB para limitar el enfoque solo a los campos de entrada
         const inputs = document.querySelectorAll('input, select');
@@ -80,6 +90,35 @@
                     }
                 }
             });
+        });
+
+        // Detectar cuando el valor es pegado en el primer input y saltar al segundo
+        document.querySelector('input[name="CodActivo"]').addEventListener('input', function() {
+            // Verifica si el campo tiene un valor (indica que se pegó algo)
+            if (this.value.trim() !== '') {
+                // Mueve el foco al siguiente campo (segundo input)
+                document.querySelector('input[name="UsuarioNew"]').focus();
+                // Bloquea el primer input y aplica el estilo de deshabilitado
+                this.disabled = true;
+                this.classList.add('input-disabled');  // Agregar clase con fondo azul y texto blanco
+            }
+        });
+
+        // Función para manejar el clic en el botón "Cancelar"
+        document.getElementById("cancelBtn").addEventListener("click", function(event) {
+            event.preventDefault();  // Evitar la acción por defecto (ir a una URL)
+
+            // Limpiar todos los campos del formulario
+            const form = document.getElementById("registerForm");
+            form.reset();
+
+            // Habilitar el primer input y remover el estilo de deshabilitado
+            const firstInput = document.querySelector('input[name="CodActivo"]');
+            firstInput.disabled = false;
+            firstInput.classList.remove('input-disabled');
+
+            // Colocar el foco en el primer input
+            firstInput.focus();
         });
     </script>
     
