@@ -70,27 +70,13 @@
     <script>
         // Establece el enfoque inicial en el primer campo de entrada
         window.onload = function() {
-            document.querySelector('input[name="CodActivo"]').focus();
-        };
-
-        // Manejo de la tecla TAB para limitar el enfoque solo a los campos de entrada
-        const inputs = document.querySelectorAll('input, select');
-
-        inputs.forEach((input, index) => {
-            input.addEventListener('keydown', (event) => {
-                // Si se presiona la tecla TAB
-                if (event.key === 'Tab') {
-                    // Si el focus está en el último campo, evitar que el foco se mueva fuera
-                    if (index === inputs.length - 1 && !event.shiftKey) {
-                        event.preventDefault();  // Evitar que el tab se mueva fuera
-                    }
-                    // Si está en el primer campo y presiona Shift+Tab, evitar que el foco salga
-                    if (index === 0 && event.shiftKey) {
-                        event.preventDefault();  // Evitar que el tab se mueva fuera
-                    }
-                }
+            const firstInput = document.querySelector('input[name="CodActivo"]');
+            firstInput.focus();
+            // Deshabilitar la capacidad de escribir
+            firstInput.addEventListener('keydown', (event) => {
+                event.preventDefault(); // Bloquea cualquier tecla que se presione
             });
-        });
+        };
 
         // Detectar cuando el valor es pegado en el primer input y saltar al segundo
         document.querySelector('input[name="CodActivo"]').addEventListener('input', function() {
