@@ -408,14 +408,17 @@ app.get('/opc2', async (req, res) => {
     }
 });
 
-app.get('/ingpreguntas', async (req, res) => {
+// Ciudades
+
+app.get('/ciudades', async (req, res) => {
     try {
-        const tableName = "preguntas";
+        const tableName = "tbl_ciudades";
+        console.log(tableName);
         const [rows] = await pool.execute(`select * from ${tableName}`);
         if (req.session.loggedin) {
             const userUser = req.session.user;
             const userName = req.session.name;
-            res.render('ingpreguntas', { data: rows, user: userUser, name: userName });
+            res.render('ciudades', { data: rows, user: userUser, name: userName });
 
         } else {
             res.send('Por favor, inicia sesión primero.');
@@ -425,6 +428,69 @@ app.get('/ingpreguntas', async (req, res) => {
                 res.status(500).send('Error conectando a la base de datos.?????');
             }
     });
+
+// Parqueaderos
+
+app.get('/parqueaderos', async (req, res) => {
+    try {
+        const tableName = "tbl_ubicaciones";
+        console.log(tableName);
+        const [rows] = await pool.execute(`select * from ${tableName}`);
+        if (req.session.loggedin) {
+            const userUser = req.session.user;
+            const userName = req.session.name;
+            res.render('parqueaderos', { data: rows, user: userUser, name: userName });
+
+        } else {
+            res.send('Por favor, inicia sesión primero.');
+        }
+    } catch (error) {
+                console.error('Error conectando a la base de datos....????:', error);
+                res.status(500).send('Error conectando a la base de datos.?????');
+            }
+    });    
+
+  // grpcc
+
+app.get('/grpcc', async (req, res) => {
+    try {
+        const tableName = "tbl_grpcc";
+        console.log(tableName);
+        const [rows] = await pool.execute(`select * from ${tableName}`);
+        if (req.session.loggedin) {
+            const userUser = req.session.user;
+            const userName = req.session.name;
+            res.render('grpcc', { data: rows, user: userUser, name: userName });
+
+        } else {
+            res.send('Por favor, inicia sesión primero.');
+        }
+    } catch (error) {
+                console.error('Error conectando a la base de datos....????:', error);
+                res.status(500).send('Error conectando a la base de datos.?????');
+            }
+    }); 
+   
+ // Activos
+
+app.get('/activos', async (req, res) => {
+    try {
+        const tableName = "tbl_activos";
+        console.log(tableName);
+        const [rows] = await pool.execute(`select * from ${tableName}`);
+        if (req.session.loggedin) {
+            const userUser = req.session.user;
+            const userName = req.session.name;
+            res.render('activos', { data: rows, user: userUser, name: userName });
+
+        } else {
+            res.send('Por favor, inicia sesión primero.');
+        }
+    } catch (error) {
+                console.error('Error conectando a la base de datos....????:', error);
+                res.status(500).send('Error conectando a la base de datos.?????');
+            }
+    }); 
 
 // Usuarios
 

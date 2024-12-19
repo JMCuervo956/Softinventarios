@@ -23,7 +23,7 @@
 
 <body>
     <%- include('partials/navigation') %>  
-    <h5 style="font-size: 14px; color: blue; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); transition: color 0.3s ease;" 
+    <h5 style="font-size: 14px; color: rgb(211, 33, 42); text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); transition: color 0.3s ease;" 
         onmouseover="this.style.color='darkblue';" 
         onmouseout="this.style.color='blue';">
         <span style="padding-left: 10px;"><%= name %></span>
@@ -35,9 +35,8 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <th>
-                            <h4>Preguntas</h4>
+                            <h4>CIUDADES</h4>
                             <a href="/menuprc" class="btn btn-success btn-sm btnind-hover-effect">Regresar</a>
-                            <a href="/preguntas" class="btn btn-primary btn-sm btnind-hover-effect">Adicionar</a>
                         </th>
                     </thead>        
                 </table>
@@ -50,15 +49,9 @@
                         <% if (data && data.length > 0) { %>
                             <% data.forEach(function(item) { %>
                                 <tr>
-                                    <td class="tex-hover-effect"><%= item.texto %></td>
+                                    <td class="tex-hover-effect"><%= item.ciudad %></td>
                                     <td>
-                                        <a href="/modificar?id=<%= item.id %>&texto=<%= item.texto %>" class="btn btn-warning btn-sm btn-hover-effect ">Mod</a>
-                                    </td>
-                                    <td>
-                                        <a href="/eliminar?id=<%= item.id %>&texto=<%= item.texto %>" class="btn btn-danger btn-sm btn-hover-effect ">Ret</a>
-                                    </td>
-                                    <td>
-                                        <a href="/opciones?id=<%= item.id %>&texto=<%= item.texto %>" class="btn btn-primary btn-sm btn-hover-effect">Opc</a>
+                                        <a href="/parqueaderos?id_ciudad=<%= item.id_ciudad %>" class="btn btn-primary btn-sm btn-hover-effect">Ubicaciones</a>
                                     </td>
                                 </tr>
                             <% }); %>
