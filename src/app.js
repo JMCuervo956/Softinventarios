@@ -544,8 +544,8 @@ app.get('/resetuser', (req, res) => {
 
 app.get('/maeprop', async (req, res) => {
     try {
-        const tableName = "tipropiedad";
-        const [rows] = await pool.execute(`select * from ${tableName}`);
+//        const tableName = "tipropiedad";
+//        const [rows] = await pool.execute(`select * from ${tableName}`);
         if (req.session.loggedin) {
             res.render('maeprop', { data: rows });
         } else {
@@ -935,20 +935,21 @@ app.post('/auth', async (req, res) => {
 
     // Valida Unidad
     const tableProp = 'tbl_propiedad';
+/*
     if (!unidad) {
         return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
     }
-    
+ */   
     // Hashear el nit ingresado
-    const nitInputHash = crypto.createHash('sha256').update(unidad).digest('hex'); // Usa crypto de Node.js
+//    const nitInputHash = crypto.createHash('sha256').update(unidad).digest('hex'); // Usa crypto de Node.js
     // Ahora, busca el registro en la base de datos usando el hash del nit
-    const [rowsud] = await pool.execute(`SELECT * FROM ${tableProp} WHERE nit = ?`, [nitInputHash]);
+//    const [rowsud] = await pool.execute(`SELECT * FROM ${tableProp} WHERE nit = ?`, [nitInputHash]);
     
-    if (rowsud.length === 0) {
-        return res.json({ status: 'error', message: 'Unidad no encontrada' });
-    }
-    const UdaRecord = rowsud[0];
-    req.session.unidad = UdaRecord.razonsocial; // mantener la información del usuario entre diferentes solicitudes durante su sesión (COMPARTIR).
+//    if (rowsud.length === 0) {
+//        return res.json({ status: 'error', message: 'Unidad no encontrada' });
+//    }
+//    const UdaRecord = rowsud[0];
+//    req.session.unidad = UdaRecord.razonsocial; // mantener la información del usuario entre diferentes solicitudes durante su sesión (COMPARTIR).
     //console.log(req.session.unidad);
     // Valida Usuario
     const tableName = 'users';
@@ -973,7 +974,7 @@ app.post('/auth', async (req, res) => {
     return res.json({ status: 'success', message: '!LOGIN Correcto!' });
 });
 
-// End - [login]
+// End - [login]  data
 
 // [preguntas] 
 
