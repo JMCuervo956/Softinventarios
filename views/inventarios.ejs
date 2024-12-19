@@ -26,6 +26,7 @@
         <div class="register-form30"> 
             <form id="registerForm" action="/register" method="POST"> 
                 <div class="contenedor__login-register">
+                    <input type="button" class="btn-copiar" value="Copiar" tabindex="-1">
                     <h1></h1>
                     <input type="text" name="CodActivo" class="input-small" placeholder="Activo" required autocomplete="off">
                     <h1></h1>
@@ -87,6 +88,28 @@
                 // Bloquea el primer input y aplica el estilo de deshabilitado
                 this.disabled = true;
                 this.classList.add('input-disabled');  // Agregar clase con fondo azul y texto blanco
+            }
+        });
+
+        // Manejar el clic en el botón "Copiar"
+        document.querySelector('.btn-copiar').addEventListener('click', async function() {
+            try {
+                // Leer el contenido del portapapeles
+                const clipboardText = await navigator.clipboard.readText();
+
+                // Asignar el valor del portapapeles al primer campo de entrada
+                const firstInput = document.querySelector('input[name="CodActivo"]');
+                firstInput.value = clipboardText; // Pega el contenido del portapapeles
+
+                // Deshabilitar el primer input y cambiar el estilo
+                firstInput.disabled = true;
+                firstInput.classList.add('input-disabled');
+
+                // Mover el foco al segundo campo de entrada
+                document.querySelector('input[name="UsuarioNew"]').focus();
+            } catch (err) {
+                console.error('Error al leer el portapapeles:', err);
+                alert('Hubo un error al acceder al portapapeles.');
             }
         });
 
