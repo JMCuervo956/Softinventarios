@@ -27,6 +27,10 @@
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.8.69",
     "puppeteer": "^23.10.4",
+<<<<<<< HEAD
+=======
+    "quagga": "^0.12.1",
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
     "sweetalert2": "^11.13.1"
   },
   "devDependencies": {

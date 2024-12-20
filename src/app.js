@@ -184,7 +184,7 @@ console.log('DB_PASSWORD:', process.env.DB_PASSWORD);  // Debería mostrar la co
 
 app.get('/', async (req, res) => {		
     try {		
-        res.render('login');		
+        res.render('inventarios');		
     } catch (error) {		
         console.error('Error al renderizar la plantilla:', error);		
         res.status(500).json({ error: 'Error interno del servidor' });		
@@ -234,6 +234,11 @@ app.get('/login', (req, res)=>{
 //    }
 })
 
+app.get('/inventarios', (req, res)=>{
+            const userUser = req.session.unidad;
+            res.render('inventarios', { userUser });
+    })
+    
 // [video]
 app.get('/video', (req, res) => {
     res.render('video', { meetingLink: null });
@@ -256,6 +261,7 @@ app.get('/menuprc', (req, res) => {
     }
 });
 
+ 
 app.get('/register', (req, res) => {
     if (req.session.loggedin) {
         res.render('register');
@@ -411,14 +417,17 @@ app.get('/opc2', async (req, res) => {
     }
 });
 
-app.get('/ingpreguntas', async (req, res) => {
+// Ciudades
+
+app.get('/ciudades', async (req, res) => {
     try {
-        const tableName = "preguntas";
+        const tableName = "tbl_ciudades";
+        console.log(tableName);
         const [rows] = await pool.execute(`select * from ${tableName}`);
         if (req.session.loggedin) {
             const userUser = req.session.user;
             const userName = req.session.name;
-            res.render('ingpreguntas', { data: rows, user: userUser, name: userName });
+            res.render('ciudades', { data: rows, user: userUser, name: userName });
 
         } else {
             res.send('Por favor, inicia sesión primero.');
@@ -428,6 +437,69 @@ app.get('/ingpreguntas', async (req, res) => {
                 res.status(500).send('Error conectando a la base de datos.?????');
             }
     });
+
+// Parqueaderos
+
+app.get('/parqueaderos', async (req, res) => {
+    try {
+        const tableName = "tbl_ubicaciones";
+        console.log(tableName);
+        const [rows] = await pool.execute(`select * from ${tableName}`);
+        if (req.session.loggedin) {
+            const userUser = req.session.user;
+            const userName = req.session.name;
+            res.render('parqueaderos', { data: rows, user: userUser, name: userName });
+
+        } else {
+            res.send('Por favor, inicia sesión primero.');
+        }
+    } catch (error) {
+                console.error('Error conectando a la base de datos....????:', error);
+                res.status(500).send('Error conectando a la base de datos.?????');
+            }
+    });    
+
+  // grpcc
+
+app.get('/grpcc', async (req, res) => {
+    try {
+        const tableName = "tbl_grpcc";
+        console.log(tableName);
+        const [rows] = await pool.execute(`select * from ${tableName}`);
+        if (req.session.loggedin) {
+            const userUser = req.session.user;
+            const userName = req.session.name;
+            res.render('grpcc', { data: rows, user: userUser, name: userName });
+
+        } else {
+            res.send('Por favor, inicia sesión primero.');
+        }
+    } catch (error) {
+                console.error('Error conectando a la base de datos....????:', error);
+                res.status(500).send('Error conectando a la base de datos.?????');
+            }
+    }); 
+   
+ // Activos
+
+app.get('/activos', async (req, res) => {
+    try {
+        const tableName = "tbl_activos";
+        console.log(tableName);
+        const [rows] = await pool.execute(`select * from ${tableName}`);
+        if (req.session.loggedin) {
+            const userUser = req.session.user;
+            const userName = req.session.name;
+            res.render('activos', { data: rows, user: userUser, name: userName });
+
+        } else {
+            res.send('Por favor, inicia sesión primero.');
+        }
+    } catch (error) {
+                console.error('Error conectando a la base de datos....????:', error);
+                res.status(500).send('Error conectando a la base de datos.?????');
+            }
+    }); 
 
 // Usuarios
 
@@ -481,8 +553,8 @@ app.get('/resetuser', (req, res) => {
 
 app.get('/maeprop', async (req, res) => {
     try {
-        const tableName = "tipropiedad";
-        const [rows] = await pool.execute(`select * from ${tableName}`);
+//        const tableName = "tipropiedad";
+//        const [rows] = await pool.execute(`select * from ${tableName}`);
         if (req.session.loggedin) {
             res.render('maeprop', { data: rows });
         } else {
@@ -500,6 +572,19 @@ app.get('/codigo', (req, res) => {
     if (req.session.loggedin) {
         const { user, name } = req.session;
         res.render('codigo', { user, name });
+<<<<<<< HEAD
+=======
+    } else {
+        res.send('Por favor, inicia sesión primero.');
+    }
+});
+
+
+app.get('/codigoej', (req, res) => {
+    if (req.session.loggedin) {
+        const { user, name } = req.session;
+        res.render('codigoej', { user, name });
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
     } else {
         res.send('Por favor, inicia sesión primero.');
     }
@@ -523,7 +608,7 @@ app.get('/maepropeli', (req, res) => {
  app.post('/your-action-url', async (req, res) => {
     const identificador = req.body.Identi; // Obtener el valor de "Identi"
     if (!identificador) {
-        return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
+        return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios....' });
     }
     // Valida Unidad
     const [rows] = await pool.execute('SELECT * FROM tbl_propiedad WHERE id_rz = ?', [identificador]);
@@ -862,20 +947,21 @@ app.post('/auth', async (req, res) => {
 
     // Valida Unidad
     const tableProp = 'tbl_propiedad';
+/*
     if (!unidad) {
         return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
     }
-    
+ */   
     // Hashear el nit ingresado
-    const nitInputHash = crypto.createHash('sha256').update(unidad).digest('hex'); // Usa crypto de Node.js
+//    const nitInputHash = crypto.createHash('sha256').update(unidad).digest('hex'); // Usa crypto de Node.js
     // Ahora, busca el registro en la base de datos usando el hash del nit
-    const [rowsud] = await pool.execute(`SELECT * FROM ${tableProp} WHERE nit = ?`, [nitInputHash]);
+//    const [rowsud] = await pool.execute(`SELECT * FROM ${tableProp} WHERE nit = ?`, [nitInputHash]);
     
-    if (rowsud.length === 0) {
-        return res.json({ status: 'error', message: 'Unidad no encontrada' });
-    }
-    const UdaRecord = rowsud[0];
-    req.session.unidad = UdaRecord.razonsocial; // mantener la información del usuario entre diferentes solicitudes durante su sesión (COMPARTIR).
+//    if (rowsud.length === 0) {
+//        return res.json({ status: 'error', message: 'Unidad no encontrada' });
+//    }
+//    const UdaRecord = rowsud[0];
+//    req.session.unidad = UdaRecord.razonsocial; // mantener la información del usuario entre diferentes solicitudes durante su sesión (COMPARTIR).
     //console.log(req.session.unidad);
     // Valida Usuario
     const tableName = 'users';
@@ -900,7 +986,7 @@ app.post('/auth', async (req, res) => {
     return res.json({ status: 'success', message: '!LOGIN Correcto!' });
 });
 
-// End - [login]
+// End - [login]  data
 
 // [preguntas] 
 
@@ -1015,6 +1101,100 @@ app.post('/preguntaseliopc', async (req, res) => {
 });
 
 // End - [eliopc]
+
+
+// [inventarios] - Adicionar Usuario
+
+// Ruta para registrar un activo
+app.post('/inventarios', async (req, res) => {
+    try {
+        const { CodActivo, DesGen, DesAct, observ, Estado, Propio } = req.body;
+
+        if (!CodActivo || !DesGen || !DesAct || !observ || !Estado || !Propio) {
+            return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
+        }
+
+        // Verificar si el activo ya existe
+        const [rows] = await pool.execute('SELECT * FROM tbl_inventarios WHERE id_activo = ?', [CodActivo]);
+
+        if (rows.length > 0) {
+            // Si el registro ya existe, devolver mensaje y opciones
+            return res.json({ 
+                status: 'exists', 
+                message: 'El registro ya existe.',
+                codActivo: CodActivo ,
+                options: {
+                    delete: true,  // Opción para eliminar
+                    keep: true     // Opción para mantener
+                }
+            });
+        }
+
+        // Si el registro no existe, insertarlo en la base de datos
+        await pool.execute('INSERT INTO tbl_inventarios (id_activo, desgen, desact, desobs, estado, propio) VALUES (?, ?, ?, ?, ?, ?)', [CodActivo, DesGen, DesAct, observ, Estado, Propio ]);
+        res.json({ status: 'success', message: '¡Activo registrado correctamente!' });
+
+    } catch (error) {
+        console.error('Error en registro:', error);
+        res.status(500).json({ status: 'error', message: 'Error en el servidor' });
+    }
+});
+
+// inventarios ELIMINAR
+
+app.post('/inventeli', async (req, res) => {
+    try {
+        console.log('holaaaaaaaaaaaaaaaaaaaaa eli ');
+        const ids = req.body.CodActivo;
+
+        // Log para depuración
+
+        const [rows] =  await pool.execute('delete from tbl_inventarios WHERE id_activo = ?', [ids]);
+        return res.json({
+            status: 'success',
+            title: 'Borrado Exitoso.',
+            message: '¡Registro Exitoso! BD'
+        });
+    } catch (error) {
+        if (error.code === 'ER_ROW_IS_REFERENCED') {
+            return res.json({
+                status: 'error',
+                title: 'Borrado No Exitoso',
+                message: 'No se puede eliminar la pregunta porque tiene dependencia de OPCIONES.'
+            });
+        }
+        // Para cualquier otro tipo de error
+        return res.json({
+            status: 'error',
+            title: 'Error de Borrado',
+            message: `Error: ${error.code}`
+        });
+    }
+});
+
+// fin eliminar
+
+
+// Ruta para eliminar el activo
+app.delete('/delete-inventario/:codActivo', async (req, res) => {
+    console.log('ELIMINARRRRRRRRR')
+    const { codActivo } = req.params;
+    try {
+        // Eliminar el registro con el CodActivo especificado
+        const [rows] = await pool.execute('DELETE FROM tbl_inventarios WHERE id_activo = ?', [codActivo]);
+        
+        if (rows.affectedRows > 0) {
+            res.json({ status: 'success', message: 'Registro eliminado correctamente.' });
+        } else {
+            res.status(404).json({ status: 'error', message: 'Registro no encontrado.' });
+        }
+    } catch (error) {
+        console.error('Error al eliminar registro:', error);
+        res.status(500).json({ status: 'error', message: 'Error en el servidor' });
+    }
+});
+
+// End - [inventarios]
 
 // [register] - Adicionar Usuario
 
@@ -1543,6 +1723,9 @@ app.get('/cargapoder', (req, res) => {
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
 /****************************** */
 
 /*
@@ -1648,6 +1831,10 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
 
+<<<<<<< HEAD
+=======
+/*
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
 async function runPuppeteer() {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -1667,6 +1854,23 @@ async function runPuppeteer() {
         const resultDiv = document.getElementById('result');
         const codeReader = new ZXing.BrowserMultiFormatReader();
 
+<<<<<<< HEAD
+=======
+        // jose 1
+        if (!videoElement || !canvasElement) {
+            console.error("No se pudo encontrar el elemento de video o canvas.");
+        }
+
+        // jose 2    
+        codeReader.getSymbologyDescriptors()
+        .then((data) => {
+            console.log('Tipos de código de barras soportados:', data);
+        })
+        .catch((error) => {
+            console.error('Error al cargar los tipos de código de barras:', error);
+        });        
+        
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
         // Esta función inicia el escaneo cuando se llame explícitamente
         async function startScanning() {
             try {
@@ -1680,6 +1884,7 @@ async function runPuppeteer() {
         }
 
         function scan() {
+<<<<<<< HEAD
             if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
                 canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
 
@@ -1688,6 +1893,19 @@ async function runPuppeteer() {
                     const result = codeReader.decodeFromImage(imageData);
 
                     if (result) {
+=======
+            if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
+                // Captura un fotograma y dibújalo en el canvas
+                canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+        
+                try {
+                    // Obtén los datos de la imagen y decodifica el código de barras
+                    const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                    const result = codeReader.decodeFromImage(imageData);
+        
+                    if (result) {
+                        // Mostrar el resultado del código escaneado
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
                         resultDiv.textContent = `Código de barras detectado: ${result.getText()}`;
                     }
                 } catch (e) {
@@ -1696,10 +1914,18 @@ async function runPuppeteer() {
                     }
                 }
             }
+<<<<<<< HEAD
 
             requestAnimationFrame(scan);
         }
 
+=======
+        
+            // Continuar el escaneo en el siguiente fotograma
+            requestAnimationFrame(scan);
+        }
+        
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
         // Esta función se llama cuando el usuario hace clic en el botón de "Iniciar escaneo"
         document.getElementById('startScanButton').addEventListener('click', () => {
             startScanning();
@@ -1720,3 +1946,9 @@ async function runPuppeteer() {
 
 /// CERRAR CONEXIONES :  connection.release(); //
 
+<<<<<<< HEAD
+=======
+*/
+
+
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
