@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escaneo de Código de Barras</title>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+</head>
+<body>
+    <h1>Escaneo de Código de Barras</h1>
+
+    <!-- Elementos para mostrar el video y el canvas -->
+    <video id="video" width="300" height="200" autoplay></video>
+    <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+
+    <!-- Campo de texto para mostrar el código de barras escaneado -->
+    <label for="barcode">Código de Barras Detectado:</label>
+    <input type="text" id="barcode" readonly /> <!-- Este campo mostrará el código escaneado -->
+
+    <!-- Botón para iniciar el escaneo -->
+    <button id="startScanButton">Iniciar escaneo</button>
+    <form action="/procesar" method="POST">
+        <label for="barcode">Código de Barras:</label>
+        <input type="text" id="barcode" name="barcode" readonly />
+        <button type="submit">Enviar</button>
+    </form>
+    <script>
+        // Referencias a los elementos
+        const videoElement = document.getElementById('video');
+        const canvasElement = document.getElementById('canvas');
+        const canvas = canvasElement.getContext('2d');
+        const barcodeInput = document.getElementById('barcode'); // Campo de texto para guardar el código escaneado
+        const resultDiv = document.getElementById('result');
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+
+        async function startScanning() {
+            try {
+                // Accede a la cámara del dispositivo
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                videoElement.srcObject = stream;
+                videoElement.setAttribute('playsinline', true);  // Necesario en iOS
+                requestAnimationFrame(scan);  // Comienza a escanear
+            } catch (err) {
+                console.error('No se pudo acceder a la cámara:', err);
+            }
+        }
+
+        function scan() {
+            // Cuando el video tiene datos suficientes, procesamos los fotogramas
+            if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+                // Captura un fotograma y dibújalo en el canvas
+                canvas.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+                try {
+                    // Decodifica el código de barras desde la imagen capturada
+                    const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                    const result = codeReader.decodeFromImage(imageData);
+
+                    if (result) {
+                        // Cuando se detecta el código de barras, lo mostramos en el campo de texto
+                        barcodeInput.value = result.getText();  // Guardamos el código escaneado en el campo de texto
+                    }
+                } catch (e) {
+                    if (!(e instanceof ZXing.NotFoundException)) {
+                        console.error('Error al escanear el código de barras:', e);
+                    }
+                }
+            }
+
+            // Continuamos escaneando en el siguiente fotograma
+            requestAnimationFrame(scan);
+        }
+
+        // Inicia el escaneo cuando el usuario hace clic en el botón
+        document.getElementById('startScanButton').addEventListener('click', () => {
+            startScanning();
+        });
+    </script>
+</body>
+</html>

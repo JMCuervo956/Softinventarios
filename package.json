@@ -1,5 +1,5 @@
 {
-  "name": "aplsoft",
+  "name": "softinventarios",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@zxing/library": "^0.21.3",
     "bcryptjs": "^2.4.3",
     "canvas": "^2.11.2",
     "chart.js": "^3.9.1",
@@ -25,6 +26,7 @@
     "mysql2": "^3.11.3",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.8.69",
+    "puppeteer": "^23.10.4",
     "sweetalert2": "^11.13.1"
   },
   "devDependencies": {
