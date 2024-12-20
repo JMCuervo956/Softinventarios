@@ -211,6 +211,15 @@ app.get('/origen/:folder/:filename', (req, res) => {
     });
 });
 
+// INVENTARIOS
+
+app.get('/inventario', (req, res) => {
+    if (req.session.loggedin) {
+        res.render('inventario');
+    } else {
+        res.send('Por favor, inicia sesión primero.');
+    }
+});
 
 // Rutas de autenticación y registro
 //app.get('/login', (req, res) => res.render('login'));
@@ -1013,7 +1022,6 @@ app.post('/register', async (req, res) => {
     try {
         const rz = '1';
         const id_rz = 'Propiedad';
-
         const { UsuarioNew, UsuarioNom, rol, PassNew } = req.body;
         if (!UsuarioNew || !UsuarioNom || !rol || !PassNew) {
             return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
@@ -1534,6 +1542,7 @@ app.get('/cargapoder', (req, res) => {
     res.render('cargapoder'); // Renderiza cargapoder.ejs
 });
 
+<<<<<<< HEAD
 /****************************** */
 
 /*
@@ -1633,6 +1642,8 @@ app.post('/procesar', (req, res) => {
     res.send(`Código de barras recibido: ${barcode}`);
 });
 
+=======
+>>>>>>> 2bae43f8696704fd763c7f647349185517cde258
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
