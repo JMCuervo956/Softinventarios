@@ -32,7 +32,15 @@ body {
 /*     background-image: url('/img/edificios.jpg');  */
 
 .custom-navbar-bg {
+<<<<<<< HEAD
     background-color: #87CEEB; /* Azul oscuro *  de encabezado "" */
+=======
+<<<<<<< HEAD
+    background-color: #87CEEB; /* Azul oscuro *  de encabezado "" */
+=======
+    background-color: #430496; /* Azul oscuro *  de encabezado "" */
+>>>>>>> 8974dc721e5edded72c523d8bf4608ec8eed8ae2
+>>>>>>> 3aef0324390aef69e9cd52071cad933f3119878a
 }
 
 /*     background: #b8b8bb ; */

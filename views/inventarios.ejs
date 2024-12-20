@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <%- include('partials/head') %>
 
+    <!-- Agregar el estilo para el campo deshabilitado -->
     <style>
         .input-disabled {
             background-color: blue;  /* Fondo azul */
@@ -18,6 +19,7 @@
     </style>
 </head>
 <body>
+    <script src="app.js"></script>
     <%- include('partials/navigation') %>  
     <div class="content">
         <h4>Registro de Inventario</h4>
@@ -42,7 +44,7 @@
                             <option value="Bueno" selected>Bueno</option>
                             <option value="Regular">Regular</option>
                             <option value="Malo">Malo</option>
-                        </select>S
+                        </select>
                     </div>
                     
                     <div>
@@ -58,7 +60,8 @@
                         <h5></h5>
                         <input type="submit" class="btn-save" value="Registrar" tabindex="-1">
                         <a href="#" id="cancelBtn" class="btn-cancel" tabindex="-1">Cancelar</a> <!-- Modificado: Cambiar href -->
-                        <input type="button" class="btn-copiar" value="Eliminar" tabindex="-1" style="opacity: 1;" id="btnEliminar">
+                        <input type="button" class="btn-copiar" value="Eliminar" tabindex="-1" style="opacity: 0;" id="btnEliminar">
+
                     </div>
 
                     <!-- Campo oculto para enviar el valor de CodActivo -->
@@ -74,6 +77,10 @@
         window.onload = function() {
             const firstInput = document.querySelector('input[name="CodActivo"]');
             firstInput.focus();
+            // Deshabilitar la capacidad de escribir
+            firstInput.addEventListener('keydown', (event) => {
+                event.preventDefault(); // Bloquea cualquier tecla que se presione
+            });
         };
 
         // Manejar el clic en el botón "Copiar"
@@ -117,7 +124,6 @@
         // Función para manejar el clic en el botón "Cancelar"
         document.getElementById("cancelBtn").addEventListener("click", function(event) {
             event.preventDefault();  // Evitar la acción por defecto (ir a una URL)
-
             // Limpiar todos los campos del formulario
             const form = document.getElementById("registerForm");
             form.reset();
@@ -175,17 +181,17 @@
                     title: result.title,
                     text: result.message,
                     icon: result.status,
-                    showCancelButton: true,
-                    confirmButtonText: 'Eliminar',
-                    cancelButtonText: 'Mantener',
+//                    showCancelButton: true,
+ //                   confirmButtonText: 'Eliminar',
+ //                   cancelButtonText: 'Mantener',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Si el usuario elige eliminar
-                        eliminarActivo(codActivo); // Llamada a la función para eliminar el activo
+                        //eliminarActivo(codActivo); // Llamada a la función para eliminar el activo
 
                         // Hacer visible el botón de eliminar
                         document.getElementById('btnEliminar').style.opacity = '1'; // Cambia a visible
-                        Swal.fire('Registro Eliminado.', '', 'info');
+                        //Swal.fire('Registro Eliminado.', '', 'info');
                     } else {
                         // Si el usuario elige mantener, no hacemos nada
                         Swal.fire('El Activo se mantiene sin cambios.', '', 'info');
@@ -203,7 +209,7 @@
 
         // Función para eliminar el activo
         async function eliminarActivo(codActivo) {
-            console.log("Eliminando activo: " + codActivo); // Para depurar
+            Swal.fire('Registro Eliminado 1.', '', 'info');
             const response = await fetch(`/inventarios/eliminar/${codActivo}`, {
                 method: 'DELETE'
             });
@@ -230,6 +236,42 @@
             }
         }
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM completamente cargado');
+
+            document.getElementById('btnEliminar').addEventListener('click', async function(event) {
+                console.log('Botón clickeado');
+                event.preventDefault(); // Evitar el comportamiento por defecto (enviar formulario)
+                const form = document.getElementById('registerForm'); // Obtener el formulario
+                const formData = new FormData(form);
+                console.log('Datos del formulario: ', Array.from(formData.entries()));
+
+                const response = await fetch('/inventeli', {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                });
+
+                console.log('Respuesta del servidor recibida');
+
+                const result = await response.json();
+                Swal.fire({
+                    title: result.title || 'Error',
+                    text: result.message || 'Hubo un problema',
+                    icon: result.status,
+                    showConfirmButton: true,
+                    timer: result.status === 'success' ? 2500 : null // Timer solo para éxito
+                }).then(() => {
+                    if (result.status === 'success') {
+                        console.log('Redirigiendo...');
+                        window.location.href = '/inventarios'; // Redirigir al usuario si es necesario
+                    }
+                });
+            });
+        });
+    </script>
+
 
     <%- include('partials/footer') %>  
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
