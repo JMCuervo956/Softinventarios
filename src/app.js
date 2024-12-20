@@ -596,7 +596,7 @@ app.get('/maepropeli', (req, res) => {
  app.post('/your-action-url', async (req, res) => {
     const identificador = req.body.Identi; // Obtener el valor de "Identi"
     if (!identificador) {
-        return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
+        return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios....' });
     }
     // Valida Unidad
     const [rows] = await pool.execute('SELECT * FROM tbl_propiedad WHERE id_rz = ?', [identificador]);
@@ -1090,13 +1090,106 @@ app.post('/preguntaseliopc', async (req, res) => {
 
 // End - [eliopc]
 
+
+// [inventarios] - Adicionar Usuario
+
+// Ruta para registrar un activo
+app.post('/inventarios', async (req, res) => {
+    try {
+        const { CodActivo, DesGen, DesAct, observ, Estado, Propio } = req.body;
+
+        if (!CodActivo || !DesGen || !DesAct || !observ || !Estado || !Propio) {
+            return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
+        }
+
+        // Verificar si el activo ya existe
+        const [rows] = await pool.execute('SELECT * FROM tbl_inventarios WHERE id_activo = ?', [CodActivo]);
+
+        if (rows.length > 0) {
+            // Si el registro ya existe, devolver mensaje y opciones
+            return res.json({ 
+                status: 'exists', 
+                message: 'El registro ya existe.',
+                codActivo: CodActivo ,
+                options: {
+                    delete: true,  // Opción para eliminar
+                    keep: true     // Opción para mantener
+                }
+            });
+        }
+
+        // Si el registro no existe, insertarlo en la base de datos
+        await pool.execute('INSERT INTO tbl_inventarios (id_activo, desgen, desact, desobs, estado, propio) VALUES (?, ?, ?, ?, ?, ?)', [CodActivo, DesGen, DesAct, observ, Estado, Propio ]);
+        res.json({ status: 'success', message: '¡Activo registrado correctamente!' });
+
+    } catch (error) {
+        console.error('Error en registro:', error);
+        res.status(500).json({ status: 'error', message: 'Error en el servidor' });
+    }
+});
+
+// inventarios ELIMINAR
+
+app.post('/inventeli', async (req, res) => {
+    try {
+        console.log('holaaaaaaaaaaaaaaaaaaaaa eli ');
+        const ids = req.body.CodActivo;
+
+        // Log para depuración
+
+        const [rows] =  await pool.execute('delete from tbl_inventarios WHERE id_activo = ?', [ids]);
+        return res.json({
+            status: 'success',
+            title: 'Borrado Exitoso.',
+            message: '¡Registro Exitoso! BD'
+        });
+    } catch (error) {
+        if (error.code === 'ER_ROW_IS_REFERENCED') {
+            return res.json({
+                status: 'error',
+                title: 'Borrado No Exitoso',
+                message: 'No se puede eliminar la pregunta porque tiene dependencia de OPCIONES.'
+            });
+        }
+        // Para cualquier otro tipo de error
+        return res.json({
+            status: 'error',
+            title: 'Error de Borrado',
+            message: `Error: ${error.code}`
+        });
+    }
+});
+
+// fin eliminar
+
+
+// Ruta para eliminar el activo
+app.delete('/delete-inventario/:codActivo', async (req, res) => {
+    console.log('ELIMINARRRRRRRRR')
+    const { codActivo } = req.params;
+    try {
+        // Eliminar el registro con el CodActivo especificado
+        const [rows] = await pool.execute('DELETE FROM tbl_inventarios WHERE id_activo = ?', [codActivo]);
+        
+        if (rows.affectedRows > 0) {
+            res.json({ status: 'success', message: 'Registro eliminado correctamente.' });
+        } else {
+            res.status(404).json({ status: 'error', message: 'Registro no encontrado.' });
+        }
+    } catch (error) {
+        console.error('Error al eliminar registro:', error);
+        res.status(500).json({ status: 'error', message: 'Error en el servidor' });
+    }
+});
+
+// End - [inventarios]
+
 // [register] - Adicionar Usuario
 
 app.post('/register', async (req, res) => {
     try {
         const rz = '1';
         const id_rz = 'Propiedad';
-
         const { UsuarioNew, UsuarioNom, rol, PassNew } = req.body;
         if (!UsuarioNew || !UsuarioNom || !rol || !PassNew) {
             return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
